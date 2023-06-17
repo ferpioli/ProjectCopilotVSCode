@@ -1,3 +1,6 @@
+![logo](logogitcopilot.jpg)
+
+
 GitHub Copilot e ChatGPT: Impulsionando seu desenvolvimento com IA
 
 - Aprendendo a implementar a extensão do github Copillot Labs no VSCode
@@ -6,7 +9,7 @@ GitHub Copilot e ChatGPT: Impulsionando seu desenvolvimento com IA
 - Fazendo melhorias nocenario
 
 
-![logo](logogitcopilot.jpg)
+
 
 
 
