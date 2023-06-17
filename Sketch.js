@@ -1,3 +1,8 @@
+let bolaImagem;
+let jogadorImagem;
+let computadorImagem;
+let fundoImagem;
+
 class Raquete {
     constructor(x) {
         this.x = x;
@@ -29,14 +34,20 @@ class Raquete {
         }
     }
     desenha() {
-        fill(color(255, 255, 255));
-        rect(this.x, this.y, this.w, this.h);
+        // se a raquete é o jogador
+        if (this.x < width / 2) {
+            image(jogadorImagem, this.x, this.y, this.w, this.h);
+        } else {
+            image(computadorImagem, this.x, this.y, this.w, this.h);
+        }
+        // fill(color(255, 255, 255));
+        // rect(this.x, this.y, this.w, this.h);
     }
 }
 
 class Bola {
     constructor() {
-        this.r = 25;
+        this.r = 12;
         this.reset();
     }
 
@@ -46,11 +57,15 @@ class Bola {
         const velecidadeMaxima = 5
         this.vx = Math.random() * velecidadeMaxima * 2 - velecidadeMaxima;
         this.vy = Math.random() * velecidadeMaxima * 2 - velecidadeMaxima;
+        // angulo de rotacao atual
+        this.angulo = 0;
     }
 
     update() {
         this.x += this.vx;
         this.y += this.vy;
+        // rotaciona de acordo com a velocidade x e y
+        this.angulo += Math.sqrt(this.vx * this.vx + this.vy * this.vy) / 30;
         
         if (this.x < this.r || this.x > width - this.r) {
             this.reset();
@@ -69,8 +84,12 @@ class Bola {
     }
 
     desenha() {
-        fill(color(255, 0, 0))
-        ellipse(this.x, this.y, this.r * 2, this.r * 2);
+        // rotaciona antes de desenhar
+        push();
+        translate(this.x, this.y);
+        rotate(this.angulo);
+        image(bolaImagem, -this.r, -this.r, this.r * 2, this.r * 2);
+        pop();
     }
 }
 
@@ -89,9 +108,19 @@ function colideRetanguloCirculo(cx, cy, raio, x, y, w, h) {
     return true;
 }
 
+
+
+
 let bola;
 let jogador;
 let computador;
+
+function preload() {
+    bolaImagem = loadImage('bola.png');
+    jogadorImagem = loadImage('barra01.png');
+    computadorImagem = loadImage('barra02.png');
+    fundoImagem = loadImage('fundo1.png');
+}
 
 function setup() {
     createCanvas(800, 400);
@@ -101,7 +130,21 @@ function setup() {
 }
 
 function draw() {
-    background(color(0, 0, 0));
+    
+    // centralized fundoImagem, with canvas aspectRatio, and zoom out as maximun as possible
+    let canvasAspectRatio = width / height;
+    let fundoAspectRatio = fundoImagem.width / fundoImagem.height;
+    let zoom = 1;
+    if (canvasAspectRatio > fundoAspectRatio) {
+        zoom = width / fundoImagem.width;
+    } else {
+        zoom = height / fundoImagem.height;
+    }
+    let scaledWidth = fundoImagem.width * zoom;
+    let scaledHeight = fundoImagem.height * zoom;
+    image(fundoImagem, (width - scaledWidth) / 2, (height - scaledHeight) / 2, scaledWidth, scaledHeight);
+    
+
     bola.update();
     bola.desenha();
     jogador.update();
