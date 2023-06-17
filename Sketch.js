@@ -1,17 +1,25 @@
 class Raquete {
-    constructor() {
-        this.x = 30;
+    constructor(x) {
+        this.x = x;
         this.y = height / 2;
         this.w = 10;
         this.h = 60;
-
-    }
-    desenha() {
-        fill(255);
-        rect(this.x, this.y, this.w, this.h);
     }
     update() {
-        this.y = mouseY;
+
+        // se a raquete é o jogador
+        if (this.x < width / 2) {
+            this.y = mouseY;
+        } else {
+            // se a bola está em cima vai pra cima
+            if (bola.y < this.y) {
+                this.y -= 5;
+            } else {
+                // se a bola está em baixo vai pra baixo
+                this.y += 5;
+            }
+        }
+
         //limitar dentro da tela
         if (this.y < 0) {
             this.y = 0;
@@ -20,72 +28,84 @@ class Raquete {
             this.y = height - this.h;
         }
     }
+    desenha() {
+        fill(color(255, 255, 255));
+        rect(this.x, this.y, this.w, this.h);
+    }
 }
+
 class Bola {
-    constructor(x, y, vx, vy) {
-        this.x = Math.random() * width;
-        this.y = Math.random() * height;
+    constructor() {
         this.r = 25;
         this.reset();
-        this.vx = Math.random() * 10 - 5;
-        this.vy = Math.random() * 10 - 5;
     }
+
     reset() {
         this.x = width / 2;
         this.y = height / 2;
-        this.vx = Math.random() * 10 - 5;
-        this.vy = Math.random() * 10 - 5;
+        const velecidadeMaxima = 5
+        this.vx = Math.random() * velecidadeMaxima * 2 - velecidadeMaxima;
+        this.vy = Math.random() * velecidadeMaxima * 2 - velecidadeMaxima;
     }
+
     update() {
-        this.x = this.x + this.vx;
-        this.y = this.y + this.vy;
+        this.x += this.vx;
+        this.y += this.vy;
+        
         if (this.x < this.r || this.x > width - this.r) {
             this.reset();
         }
-
-        // se tocar na parede, inverte a velocidade
-        if (this.x < 25 || this.x > width - 25) {
-            this.vx = this.vx * -1;
+        if (this.y < this.r || this.y > height - this.r) {
+            this.vy *= -1;
         }
-        //idem para a parede de cima e de baixo
-        if (this.y < 25 || this.y > height - 25) {
-            this.vy = this.vy * -1;
-        }
-        //se colisao com o jogador inverte a velocidade considerando o raio da bola
-        const colideNoX = this.x - this.r > jogador.x && this.x -this.r < jogador.x + jogador.w;
-        const colideNoY = 
-        this.y + this.r >= jogador.y && 
-        this.y - this.r <= jogador.y + jogador.h;
 
-        if (colideNoX && colideNoY) {
-            this.vx = this.vx * -1;
+        if (colideRetanguloCirculo(this.x, this.y, this.r, jogador.x, jogador.y, jogador.w, jogador.h) ||
+            colideRetanguloCirculo(this.x, this.y, this.r, computador.x, computador.y, computador.w, computador.h)) {
+            this.vx *= -1;
+            this.vx *= 1.1;
+            this.vy *= 1.1;
         }
 
     }
+
     desenha() {
-        fill(255);
-        ellipse(this.x, this.y, 50, 50);
+        fill(color(255, 0, 0))
+        ellipse(this.x, this.y, this.r * 2, this.r * 2);
     }
 }
+
+// verifica a colisão entre um círculo e retângulo
+// onde círculo é raio e cx, cy
+// e retângulo é x, y, w, h
+function colideRetanguloCirculo(cx, cy, raio, x, y, w, h) {
+    // se o círculo está a esquerda ou a direita do retângulo
+    if (cx + raio < x || cx - raio > x + w) {
+        return false;
+    }
+    // se o círculo está acima ou abaixo do retângulo
+    if (cy + raio < y || cy - raio > y + h) {
+        return false;
+    }
+    return true;
+}
+
 let bola;
 let jogador;
+let computador;
 
-// funcao setup do p5Js
 function setup() {
     createCanvas(800, 400);
-    bola = new Bola(200, 200, Math.floor(Math.random() * 10) + 1, Math.floor(Math.random() * 10) + 1);
-    jogador = new Raquete();
-
-
+    bola = new Bola();
+    jogador = new Raquete(30);
+    computador = new Raquete(width - 30 - 10);
 }
 
-
-//funcao draw do p5Js
 function draw() {
-    //desenha uma bola
-    background(0);
-    bola.desenha();
+    background(color(0, 0, 0));
     bola.update();
-    jogador.desenha();
+    bola.desenha();
     jogador.update();
+    jogador.desenha();
+    computador.update();
+    computador.desenha();
 }
