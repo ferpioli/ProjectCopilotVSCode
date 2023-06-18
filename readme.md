@@ -11,7 +11,7 @@ GitHub Copilot e ChatGPT: Impulsionando seu desenvolvimento com IA
 
 
 
-
+![logo](game.gif)
 
 
 #exemplo de comando em portugues usados no copilot labs durante a criação
